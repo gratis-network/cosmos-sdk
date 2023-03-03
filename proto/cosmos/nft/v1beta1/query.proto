@@ -3,7 +3,7 @@ package cosmos.nft.v1beta1;
 
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "google/api/annotations.proto";
-import "cosmos/nft/v1beta1/nft.proto";
+import "cosmos/base/v1beta1/nft.proto";
 
 option go_package = "github.com/cosmos/cosmos-sdk/x/nft";
 
@@ -87,7 +87,7 @@ message QueryNFTsRequest {
 
 // QueryNFTsResponse is the response type for the Query/NFTs RPC methods
 message QueryNFTsResponse {
-  repeated cosmos.nft.v1beta1.NFT        nfts       = 1;
+  repeated cosmos.base.v1beta1.NFT        nfts       = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -99,7 +99,7 @@ message QueryNFTRequest {
 
 // QueryNFTResponse is the response type for the Query/NFT RPC method
 message QueryNFTResponse {
-  cosmos.nft.v1beta1.NFT nft = 1;
+  cosmos.base.v1beta1.NFT nft = 1;
 }
 
 // QueryClassRequest is the request type for the Query/Class RPC method
@@ -109,7 +109,7 @@ message QueryClassRequest {
 
 // QueryClassResponse is the response type for the Query/Class RPC method
 message QueryClassResponse {
-  cosmos.nft.v1beta1.Class class = 1;
+  cosmos.base.v1beta1.Class class = 1;
 }
 
 // QueryClassesRequest is the request type for the Query/Classes RPC method
@@ -120,6 +120,6 @@ message QueryClassesRequest {
 
 // QueryClassesResponse is the response type for the Query/Classes RPC method
 message QueryClassesResponse {
-  repeated cosmos.nft.v1beta1.Class      classes    = 1;
+  repeated cosmos.base.v1beta1.Class      classes    = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

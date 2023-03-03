@@ -498,10 +498,10 @@ func (m *Vote) GetMetadata() string {
 
 // DepositParams defines the params for deposits on governance proposals.
 type DepositParams struct {
-	//  Minimum deposit for a proposal to enter voting period.
+	// Minimum deposit for a proposal to enter voting period.
 	MinDeposit []types.Coin `protobuf:"bytes,1,rep,name=min_deposit,json=minDeposit,proto3" json:"min_deposit,omitempty"`
-	//  Maximum period for Atom holders to deposit on a proposal. Initial value: 2
-	//  months.
+	// Maximum period for Atom holders to deposit on a proposal. Initial value: 2
+	// months.
 	MaxDepositPeriod *time.Duration `protobuf:"bytes,2,opt,name=max_deposit_period,json=maxDepositPeriod,proto3,stdduration" json:"max_deposit_period,omitempty"`
 }
 
@@ -554,7 +554,7 @@ func (m *DepositParams) GetMaxDepositPeriod() *time.Duration {
 
 // VotingParams defines the params for voting on governance proposals.
 type VotingParams struct {
-	//  Length of the voting period.
+	// Length of the voting period.
 	VotingPeriod *time.Duration `protobuf:"bytes,1,opt,name=voting_period,json=votingPeriod,proto3,stdduration" json:"voting_period,omitempty"`
 }
 
@@ -600,13 +600,13 @@ func (m *VotingParams) GetVotingPeriod() *time.Duration {
 
 // TallyParams defines the params for tallying votes on governance proposals.
 type TallyParams struct {
-	//  Minimum percentage of total stake needed to vote for a result to be
-	//  considered valid.
+	// Minimum percentage of total stake needed to vote for a result to be
+	// considered valid.
 	Quorum string `protobuf:"bytes,1,opt,name=quorum,proto3" json:"quorum,omitempty"`
-	//  Minimum proportion of Yes votes for proposal to pass. Default value: 0.5.
+	// Minimum proportion of Yes votes for proposal to pass. Default value: 0.5.
 	Threshold string `protobuf:"bytes,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	//  Minimum value of Veto votes to Total votes ratio for proposal to be
-	//  vetoed. Default value: 1/3.
+	// Minimum value of Veto votes to Total votes ratio for proposal to be
+	// vetoed. Default value: 1/3.
 	VetoThreshold string `protobuf:"bytes,3,opt,name=veto_threshold,json=vetoThreshold,proto3" json:"veto_threshold,omitempty"`
 }
 

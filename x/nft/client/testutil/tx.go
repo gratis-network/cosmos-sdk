@@ -36,7 +36,7 @@ DDzEQAPXBQflzNW6wbne9IfT651zCSm+j1MWaGk=
 )
 
 var (
-	ExpClass = nft.Class{
+	ExpClass = sdk.Class{
 		Id:          testClassID,
 		Name:        testClassName,
 		Symbol:      testClassSymbol,
@@ -44,7 +44,7 @@ var (
 		Uri:         testClassURI,
 	}
 
-	ExpNFT = nft.NFT{
+	ExpNFT = sdk.NFT{
 		ClassId: testClassID,
 		Id:      testID,
 		Uri:     testURI,
@@ -68,10 +68,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	genesisState := s.cfg.GenesisState
 	nftGenesis := nft.GenesisState{
-		Classes: []*nft.Class{&ExpClass},
+		Classes: []*sdk.Class{&ExpClass},
 		Entries: []*nft.Entry{{
 			Owner: Owner,
-			Nfts:  []*nft.NFT{&ExpNFT},
+			Nfts:  []*sdk.NFT{&ExpNFT},
 		}},
 	}
 

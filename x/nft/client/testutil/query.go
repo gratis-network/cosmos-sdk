@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 )
 
@@ -145,7 +146,7 @@ func (s *IntegrationTestSuite) TestQueryNFTs() {
 			Owner   string
 		}
 		expectErr    bool
-		expectResult []*nft.NFT
+		expectResult []*types.NFT
 	}{
 		{
 			name: "class id does not exist",
@@ -157,7 +158,7 @@ func (s *IntegrationTestSuite) TestQueryNFTs() {
 				Owner:   val.Address.String(),
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "owner does not exist",
@@ -169,7 +170,7 @@ func (s *IntegrationTestSuite) TestQueryNFTs() {
 				Owner:   s.owner.String(),
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "class id and owner both does not exist",
@@ -178,7 +179,7 @@ func (s *IntegrationTestSuite) TestQueryNFTs() {
 				Owner   string
 			}{},
 			expectErr:    true,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "nft exist",
@@ -190,7 +191,7 @@ func (s *IntegrationTestSuite) TestQueryNFTs() {
 				Owner:   val.Address.String(),
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{&ExpNFT},
+			expectResult: []*types.NFT{&ExpNFT},
 		},
 	}
 	for _, tc := range testCases {

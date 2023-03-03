@@ -86,7 +86,7 @@ func (k Keeper) NFTs(goCtx context.Context, r *nft.QueryNFTsRequest) (*nft.Query
 		}
 	}
 
-	var nfts []*nft.NFT
+	var nfts []*sdk.NFT
 	var pageRes *query.PageResponse
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -104,7 +104,7 @@ func (k Keeper) NFTs(goCtx context.Context, r *nft.QueryNFTsRequest) (*nft.Query
 	case len(r.ClassId) > 0 && len(r.Owner) == 0:
 		nftStore := k.getNFTStore(ctx, r.ClassId)
 		if pageRes, err = query.Paginate(nftStore, r.Pagination, func(_ []byte, value []byte) error {
-			var nft nft.NFT
+			var nft sdk.NFT
 			if err := k.cdc.Unmarshal(value, &nft); err != nil {
 				return err
 			}
@@ -181,9 +181,9 @@ func (k Keeper) Classes(goCtx context.Context, r *nft.QueryClassesRequest) (*nft
 	store := ctx.KVStore(k.storeKey)
 	classStore := prefix.NewStore(store, ClassKey)
 
-	var classes []*nft.Class
+	var classes []*sdk.Class
 	pageRes, err := query.Paginate(classStore, r.Pagination, func(_ []byte, value []byte) error {
-		var class nft.Class
+		var class sdk.Class
 		if err := k.cdc.Unmarshal(value, &class); err != nil {
 			return err
 		}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package cosmos.base.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/base/v1beta1/nft.proto";
+
+option go_package                       = "github.com/cosmos/cosmos-sdk/types";
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all)         = false;
+
+// PropertyVector defines a set of user property balances embedded in a UserProperty NFT
+message Property {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  cosmos.base.v1beta1.NFT                 nft = 1 [(gogoproto.embed) = true];
+  repeated cosmos.base.v1beta1.Coin       balances = 2
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "Coins"];
+}

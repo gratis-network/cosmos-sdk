@@ -119,6 +119,15 @@ func (acc *BaseAccount) SetSequence(seq uint64) error {
 	return nil
 }
 
+func (acc *BaseAccount) GetPropertyID() string {
+	return acc.PropertyId
+}
+
+func (acc *BaseAccount) SetPropertyID(propertyID string) error {
+	acc.PropertyId = propertyID
+	return nil
+}
+
 // Validate checks for errors on the account fields
 func (acc BaseAccount) Validate() error {
 	if acc.Address == "" || acc.PubKey == nil {
@@ -319,6 +328,9 @@ type AccountI interface {
 
 	GetSequence() uint64
 	SetSequence(uint64) error
+
+	GetPropertyID() string
+	SetPropertyID(string) error
 
 	// Ensure that account implements stringer
 	String() string

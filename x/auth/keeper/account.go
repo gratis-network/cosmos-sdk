@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -21,7 +22,24 @@ func (ak AccountKeeper) NewAccount(ctx sdk.Context, acc types.AccountI) types.Ac
 	if err := acc.SetAccountNumber(ak.GetNextAccountNumber(ctx)); err != nil {
 		panic(err)
 	}
+	// check user properties
+	//properties := ak.nftKeeper.GetNFTsOfClassByOwner(ctx, types.PropertyNftClassID, acc.GetAddress())
+	//if len(properties) == 0 {
+	//	// no properties found, create a default one
+	//	coins := sdk.NewCoins(sdk.NewInt64Coin("foo", 50))
+	//
+	//	propertyNft := sdk.NFT{
+	//		ClassId: types.PropertyNftClassID,
+	//		Id:      "2",
+	//		Uri:     "2",
+	//	}
+	//	ak.nftKeeper.Mint(ctx, propertyNft, acc.GetAddress())
+	//	defaultProperty := sdk.NewProperty(&propertyNft, coins...)
+	//	fmt.Printf("!!! New Property:\n %v\n", defaultProperty)
+	//	acc.SetPropertyID(propertyNft.Id)
+	//}
 
+	fmt.Printf("!!! New Account:\n %v\n", acc)
 	return acc
 }
 

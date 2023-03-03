@@ -21,6 +21,7 @@ message BaseAccount {
   google.protobuf.Any pub_key        = 2 [(gogoproto.jsontag) = "public_key,omitempty"];
   uint64              account_number = 3;
   uint64              sequence       = 4;
+  string              property_id    = 5;
 }
 
 // ModuleAccount defines an account for modules that holds coins on a pool.

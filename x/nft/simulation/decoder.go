@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/cosmos/cosmos-sdk/x/nft/keeper"
 )
 
@@ -17,12 +16,12 @@ func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 	return func(kvA, kvB kv.Pair) string {
 		switch {
 		case bytes.Equal(kvA.Key[:1], keeper.ClassKey):
-			var classA, classB nft.Class
+			var classA, classB sdk.Class
 			cdc.MustUnmarshal(kvA.Value, &classA)
 			cdc.MustUnmarshal(kvB.Value, &classB)
 			return fmt.Sprintf("%v\n%v", classA, classB)
 		case bytes.Equal(kvA.Key[:1], keeper.NFTKey):
-			var nftA, nftB nft.NFT
+			var nftA, nftB sdk.NFT
 			cdc.MustUnmarshal(kvA.Value, &nftA)
 			cdc.MustUnmarshal(kvB.Value, &nftB)
 			return fmt.Sprintf("%v\n%v", nftA, nftB)

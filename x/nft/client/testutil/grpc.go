@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/testutil/rest"
 	"github.com/cosmos/cosmos-sdk/x/nft"
@@ -239,7 +240,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 		}
 		expectErr    bool
 		errorMsg     string
-		expectResult []*nft.NFT
+		expectResult []*types.NFT
 	}{
 		{
 			name: "classID and owner are both empty",
@@ -249,7 +250,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 			}{},
 			errorMsg:     "must provide at least one of classID or owner",
 			expectErr:    true,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "classID is invalid",
@@ -260,7 +261,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 				ClassID: "invalid_class_id",
 			},
 			expectErr:    true,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "classID does not exist",
@@ -271,7 +272,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 				ClassID: "class-id",
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{},
+			expectResult: []*types.NFT{},
 		},
 		{
 			name: "success query by classID",
@@ -282,7 +283,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 				ClassID: ExpNFT.ClassId,
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{&ExpNFT},
+			expectResult: []*types.NFT{&ExpNFT},
 		},
 		{
 			name: "success query by owner",
@@ -293,7 +294,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 				Owner: val.Address.String(),
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{&ExpNFT},
+			expectResult: []*types.NFT{&ExpNFT},
 		},
 		{
 			name: "success query by owner and classID",
@@ -305,7 +306,7 @@ func (s *IntegrationTestSuite) TestQueryNFTsGRPC() {
 				Owner:   val.Address.String(),
 			},
 			expectErr:    false,
-			expectResult: []*nft.NFT{&ExpNFT},
+			expectResult: []*types.NFT{&ExpNFT},
 		},
 	}
 	nftsOfClassURL := val.APIAddress + "/cosmos/nft/v1beta1/nfts?class_id=%s&owner=%s"

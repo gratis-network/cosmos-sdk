@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
-	"github.com/cosmos/cosmos-sdk/x/nft"
 	"github.com/cosmos/cosmos-sdk/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/x/nft/simulation"
 )
@@ -24,7 +23,7 @@ func TestDecodeStore(t *testing.T) {
 	cdc := simapp.MakeTestEncodingConfig().Codec
 	dec := simulation.NewDecodeStore(cdc)
 
-	class := nft.Class{
+	class := sdk.Class{
 		Id:          "ClassID",
 		Name:        "ClassName",
 		Symbol:      "ClassSymbol",
@@ -34,7 +33,7 @@ func TestDecodeStore(t *testing.T) {
 	classBz, err := cdc.Marshal(&class)
 	require.NoError(t, err)
 
-	nft := nft.NFT{
+	nft := sdk.NFT{
 		ClassId: "ClassID",
 		Id:      "NFTID",
 		Uri:     "NFTURI",

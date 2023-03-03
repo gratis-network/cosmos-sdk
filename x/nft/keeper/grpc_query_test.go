@@ -3,6 +3,7 @@ package keeper_test
 import (
 	gocontext "context"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/types"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -214,7 +215,7 @@ func (s *TestSuite) TestSupply() {
 		{
 			"Success",
 			func(index int, require *require.Assertions) {
-				n := nft.NFT{
+				n := types.NFT{
 					ClassId: testClassID,
 					Id:      testID,
 					Uri:     testURI,
@@ -252,7 +253,7 @@ func (s *TestSuite) TestSupply() {
 func (s *TestSuite) TestNFTs() {
 	var (
 		req  *nft.QueryNFTsRequest
-		nfts []*nft.NFT
+		nfts []*types.NFT
 	)
 	testCases := []struct {
 		msg      string
@@ -287,7 +288,7 @@ func (s *TestSuite) TestNFTs() {
 				req = &nft.QueryNFTsRequest{
 					ClassId: "kitty1",
 				}
-				n := nft.NFT{
+				n := types.NFT{
 					ClassId: testClassID,
 					Id:      testID,
 					Uri:     testURI,
@@ -303,14 +304,14 @@ func (s *TestSuite) TestNFTs() {
 		{
 			"Success,query by owner",
 			func(index int, require *require.Assertions) {
-				err := s.app.NFTKeeper.SaveClass(s.ctx, nft.Class{
+				err := s.app.NFTKeeper.SaveClass(s.ctx, types.Class{
 					Id: "MyKitty",
 				})
 				require.NoError(err)
 
-				nfts = []*nft.NFT{}
+				nfts = []*types.NFT{}
 				for i := 0; i < 5; i++ {
-					n := nft.NFT{
+					n := types.NFT{
 						ClassId: "MyKitty",
 						Id:      fmt.Sprintf("MyCat%d", i),
 					}
@@ -347,7 +348,7 @@ func (s *TestSuite) TestNFTs() {
 					ClassId: testClassID,
 					Owner:   s.addrs[0].String(),
 				}
-				nfts = []*nft.NFT{
+				nfts = []*types.NFT{
 					{
 						ClassId: testClassID,
 						Id:      testID,
@@ -380,7 +381,7 @@ func (s *TestSuite) TestNFTs() {
 func (s *TestSuite) TestNFT() {
 	var (
 		req    *nft.QueryNFTRequest
-		expNFT nft.NFT
+		expNFT types.NFT
 	)
 	testCases := []struct {
 		msg      string
@@ -436,7 +437,7 @@ func (s *TestSuite) TestNFT() {
 					ClassId: testClassID,
 					Id:      testID,
 				}
-				expNFT = nft.NFT{
+				expNFT = types.NFT{
 					ClassId: testClassID,
 					Id:      testID,
 					Uri:     testURI,
@@ -467,7 +468,7 @@ func (s *TestSuite) TestNFT() {
 func (s *TestSuite) TestClass() {
 	var (
 		req   *nft.QueryClassRequest
-		class nft.Class
+		class types.Class
 	)
 	testCases := []struct {
 		msg      string
@@ -497,7 +498,7 @@ func (s *TestSuite) TestClass() {
 		{
 			"success",
 			func(index int, require *require.Assertions) {
-				class = nft.Class{
+				class = types.Class{
 					Id:          testClassID,
 					Name:        testClassName,
 					Symbol:      testClassSymbol,
@@ -534,7 +535,7 @@ func (s *TestSuite) TestClass() {
 func (s *TestSuite) TestClasses() {
 	var (
 		req     *nft.QueryClassesRequest
-		classes []nft.Class
+		classes []types.Class
 	)
 	testCases := []struct {
 		msg      string
@@ -556,7 +557,7 @@ func (s *TestSuite) TestClasses() {
 			"success",
 			func(index int, require *require.Assertions) {
 				req = &nft.QueryClassesRequest{}
-				classes = []nft.Class{
+				classes = []types.Class{
 					{
 						Id:          testClassID,
 						Name:        testClassName,

@@ -7,7 +7,7 @@ import (
 )
 
 // SaveClass defines a method for creating a new nft class
-func (k Keeper) SaveClass(ctx sdk.Context, class nft.Class) error {
+func (k Keeper) SaveClass(ctx sdk.Context, class sdk.Class) error {
 	if k.HasClass(ctx, class.Id) {
 		return sdkerrors.Wrap(nft.ErrClassExists, class.Id)
 	}
@@ -21,7 +21,7 @@ func (k Keeper) SaveClass(ctx sdk.Context, class nft.Class) error {
 }
 
 // UpdateClass defines a method for updating a exist nft class
-func (k Keeper) UpdateClass(ctx sdk.Context, class nft.Class) error {
+func (k Keeper) UpdateClass(ctx sdk.Context, class sdk.Class) error {
 	if !k.HasClass(ctx, class.Id) {
 		return sdkerrors.Wrap(nft.ErrClassNotExists, class.Id)
 	}
@@ -35,11 +35,11 @@ func (k Keeper) UpdateClass(ctx sdk.Context, class nft.Class) error {
 }
 
 // GetClass defines a method for returning the class information of the specified id
-func (k Keeper) GetClass(ctx sdk.Context, classID string) (nft.Class, bool) {
+func (k Keeper) GetClass(ctx sdk.Context, classID string) (sdk.Class, bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(classStoreKey(classID))
 
-	var class nft.Class
+	var class sdk.Class
 	if len(bz) == 0 {
 		return class, false
 	}
@@ -48,12 +48,12 @@ func (k Keeper) GetClass(ctx sdk.Context, classID string) (nft.Class, bool) {
 }
 
 // GetClasses defines a method for returning all classes information
-func (k Keeper) GetClasses(ctx sdk.Context) (classes []*nft.Class) {
+func (k Keeper) GetClasses(ctx sdk.Context) (classes []*sdk.Class) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, ClassKey)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var class nft.Class
+		var class sdk.Class
 		k.cdc.MustUnmarshal(iterator.Value(), &class)
 		classes = append(classes, &class)
 	}
