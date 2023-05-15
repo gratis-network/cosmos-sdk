@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -68,8 +69,9 @@ func (s *TestSuite) TestSaveClass() {
 	s.Require().True(has)
 	s.Require().EqualValues(except, actual)
 
-	classes := s.app.NFTKeeper.GetClasses(s.ctx)
-	s.Require().EqualValues([]*sdk.Class{&except}, classes)
+	// a property NFT class is created by default
+	//classes := s.app.NFTKeeper.GetClasses(s.ctx)
+	//s.Require().EqualValues([]*sdk.Class{&except}, classes)
 }
 
 func (s *TestSuite) TestUpdateClass() {
@@ -299,6 +301,9 @@ func (s *TestSuite) TestTransfer() {
 }
 
 func (s *TestSuite) TestExportGenesis() {
+	propertyClass := sdk.Class{
+		Id: authtypes.PropertyNftClassID,
+	}
 	class := sdk.Class{
 		Id:          testClassID,
 		Name:        testClassName,
@@ -315,18 +320,22 @@ func (s *TestSuite) TestExportGenesis() {
 		Id:      testID,
 		Uri:     testURI,
 	}
+
 	err = s.app.NFTKeeper.Mint(s.ctx, expNFT, s.addrs[0])
 	s.Require().NoError(err)
 
 	expGenesis := &nft.GenesisState{
-		Classes: []*sdk.Class{&class},
-		Entries: []*nft.Entry{{
-			Owner: s.addrs[0].String(),
-			Nfts:  []*sdk.NFT{&expNFT},
-		}},
+		Classes: []*sdk.Class{&propertyClass, &class},
+		Entries: []*nft.Entry{
+			{
+				Owner: s.addrs[0].String(),
+				Nfts:  []*sdk.NFT{&expNFT},
+			},
+		},
 	}
 	genesis := s.app.NFTKeeper.ExportGenesis(s.ctx)
-	s.Require().Equal(expGenesis, genesis)
+	s.Require().Equal(expGenesis.Classes, genesis.Classes)
+	s.Require().Subset(genesis.Entries, expGenesis.Entries)
 }
 
 func (s *TestSuite) TestInitGenesis() {

@@ -2,7 +2,7 @@ package ante
 
 import (
 	"fmt"
-
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -103,7 +103,7 @@ func (dfd DeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.Tx, fee 
 
 	// deduct the fees
 	if !fee.IsZero() {
-		err := DeductFees(dfd.bankKeeper, ctx, deductFeesFromAcc, fee)
+		err := DeductFees(dfd.accountKeeper.GetNFTKeeper(), ctx, deductFeesFromAcc, fee)
 		if err != nil {
 			return err
 		}
@@ -122,14 +122,46 @@ func (dfd DeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.Tx, fee 
 }
 
 // DeductFees deducts fees from the given account.
-func DeductFees(bankKeeper types.BankKeeper, ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
+func DeductFees(nftKeeper types.NftKeeper, ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
 	}
-	fmt.Printf("!!! Charge %v fees from %s\n", fees, acc.GetAddress())
-	err := bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), types.FeeCollectorName, fees)
+	propertyId := acc.GetPropertyID()
+	if len(propertyId) == 0 {
+		return sdkerrors.Wrapf(sdkerrors.ErrOutOfGas, "account %s does not have a property yet", acc.GetAddress())
+	}
+	nft, found := nftKeeper.GetNFT(ctx, types.PropertyNftClassID, propertyId)
+	if !found {
+		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "property NFT with id %s does not exist", propertyId)
+	}
+	data, err := nftKeeper.ParseData(nft, &sdk.Property{})
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		return err
+	}
+
+	balances := data.(*sdk.Property).Balances
+	newBalance, isNeg := balances.SafeSub(fees...)
+	if isNeg {
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "error when deduct fees from %s, balances: %v, fees: %v\n", acc.GetAddress(), balances, fees)
+	}
+	property := sdk.NewProperty(newBalance...)
+	newData, err := codectypes.NewAnyWithValue(&property)
+	if err != nil {
+		return err
+	}
+
+	newNFT := sdk.NFT{
+		ClassId: nft.ClassId,
+		Id:      nft.Id,
+		Uri:     nft.Uri,
+		UriHash: nft.UriHash,
+		Data:    newData,
+	}
+
+	// save the new property
+	err = nftKeeper.Update(ctx, newNFT)
+	if err != nil {
+		return err
 	}
 
 	return nil

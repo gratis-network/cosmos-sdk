@@ -154,6 +154,12 @@ func (k Keeper) HasNFT(ctx sdk.Context, classID, id string) bool {
 	return store.Has([]byte(id))
 }
 
+// ParseData unpacks data as iface type
+func (k Keeper) ParseData(token sdk.NFT, iface any) (any, error) {
+	err := k.cdc.UnpackAny(token.Data, &iface)
+	return iface, err
+}
+
 func (k Keeper) setNFT(ctx sdk.Context, token sdk.NFT) {
 	nftStore := k.getNFTStore(ctx, token.ClassId)
 	bz := k.cdc.MustMarshal(&token)

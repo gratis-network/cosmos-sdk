@@ -51,8 +51,8 @@ func (s *AnteTestSuite) TestEnsureMempoolFees() {
 
 	// keys and addresses
 	priv1, _, addr1 := testdata.KeyTestPubAddr()
-	coins := sdk.NewCoins(sdk.NewCoin("atom", sdk.NewInt(300)))
-	testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	coins := sdk.NewCoins(sdk.NewCoin("gas", sdk.NewInt(300)))
+	testutil.FundPropertyOfAccount(s.app.AccountKeeper, s.ctx, addr1, coins)
 
 	// msg and signatures
 	msg := testdata.NewTestMsg(addr1)
@@ -67,7 +67,7 @@ func (s *AnteTestSuite) TestEnsureMempoolFees() {
 	s.Require().NoError(err)
 
 	// Set high gas price so standard test fee fails
-	atomPrice := sdk.NewDecCoinFromDec("atom", sdk.NewDec(20))
+	atomPrice := sdk.NewDecCoinFromDec("gas", sdk.NewDec(20))
 	highGasPrice := []sdk.DecCoin{atomPrice}
 	s.ctx = s.ctx.WithMinGasPrices(highGasPrice)
 
@@ -126,8 +126,8 @@ func (s *AnteTestSuite) TestDeductFees() {
 	// Set account with insufficient funds
 	acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	coins := sdk.NewCoins(sdk.NewCoin("atom", sdk.NewInt(10)))
-	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	coins := sdk.NewCoins(sdk.NewCoin("gas", sdk.NewInt(10)))
+	err = testutil.FundPropertyOfAccount(s.app.AccountKeeper, s.ctx, addr1, coins)
 	s.Require().NoError(err)
 
 	dfd := ante.NewDeductFeeDecorator(s.app.AccountKeeper, s.app.BankKeeper, nil, nil)
@@ -139,7 +139,7 @@ func (s *AnteTestSuite) TestDeductFees() {
 
 	// Set account with sufficient funds
 	s.app.AccountKeeper.SetAccount(s.ctx, acc)
-	err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin("atom", sdk.NewInt(200))))
+	err = testutil.FundPropertyOfAccount(s.app.AccountKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin("gas", sdk.NewInt(200))))
 	s.Require().NoError(err)
 
 	_, err = antehandler(s.ctx, tx, false)

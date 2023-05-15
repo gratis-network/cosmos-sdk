@@ -19,7 +19,6 @@ import (
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
 // TestAccount represents an account used in the tests in x/auth/ante.
@@ -91,14 +90,20 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 		err := acc.SetAccountNumber(uint64(i))
 		s.Require().NoError(err)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		someCoins := sdk.Coins{
-			sdk.NewInt64Coin("atom", 10000000),
-		}
-		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
-		s.Require().NoError(err)
+		//someCoins := sdk.Coins{
+		//	sdk.NewInt64Coin("atom", 10000000),
+		//}
+		//err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
+		//s.Require().NoError(err)
+		//
+		//err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
+		//s.Require().NoError(err)
 
-		err = s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, minttypes.ModuleName, addr, someCoins)
-		s.Require().NoError(err)
+		// add balances to the account's property
+		coins := sdk.Coins{
+			sdk.NewInt64Coin("gas", 10000000),
+		}
+		s.app.AccountKeeper.AddBalanceToProperty(s.ctx, acc, coins)
 
 		accounts = append(accounts, TestAccount{acc, priv})
 	}

@@ -12,6 +12,7 @@ type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 	SetAccount(ctx sdk.Context, acc types.AccountI)
 	GetModuleAddress(moduleName string) sdk.AccAddress
+	GetNFTKeeper() types.NftKeeper
 }
 
 // FeegrantKeeper defines the expected feegrant keeper.

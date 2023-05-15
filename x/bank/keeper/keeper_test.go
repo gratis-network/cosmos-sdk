@@ -582,9 +582,10 @@ func (suite *IntegrationTestSuite) TestMsgSendEvents() {
 
 	// events are shifted due to the funding account events
 	events := ctx.EventManager().ABCIEvents()
-	suite.Require().Equal(10, len(events))
-	suite.Require().Equal(abci.Event(event1), events[8])
-	suite.Require().Equal(abci.Event(event2), events[9])
+	// creating new account produces 1 NFT mint event
+	suite.Require().Equal(1+10, len(events))
+	suite.Require().Equal(abci.Event(event1), events[1+8])
+	suite.Require().Equal(abci.Event(event2), events[1+9])
 }
 
 func (suite *IntegrationTestSuite) TestMsgMultiSendEvents() {
@@ -616,14 +617,14 @@ func (suite *IntegrationTestSuite) TestMsgMultiSendEvents() {
 	suite.Require().Error(app.BankKeeper.InputOutputCoins(ctx, inputs, outputs))
 
 	events := ctx.EventManager().ABCIEvents()
-	suite.Require().Equal(0, len(events))
+	suite.Require().Equal(2, len(events)) // 2 events for NFT mint from creating new accounts
 
 	// Set addr's coins but not addr2's coins
 	suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, addr, sdk.NewCoins(sdk.NewInt64Coin(fooDenom, 50))))
 	suite.Require().Error(app.BankKeeper.InputOutputCoins(ctx, inputs, outputs))
 
 	events = ctx.EventManager().ABCIEvents()
-	suite.Require().Equal(8, len(events)) // 7 events because account funding causes extra minting + coin_spent + coin_recv events
+	suite.Require().Equal(2+8, len(events)) // 7 events because account funding causes extra minting + coin_spent + coin_recv events
 
 	event1 := sdk.Event{
 		Type:       sdk.EventTypeMessage,
@@ -633,7 +634,7 @@ func (suite *IntegrationTestSuite) TestMsgMultiSendEvents() {
 		event1.Attributes,
 		abci.EventAttribute{Key: []byte(types.AttributeKeySender), Value: []byte(addr.String())},
 	)
-	suite.Require().Equal(abci.Event(event1), events[7])
+	suite.Require().Equal(abci.Event(event1), events[2+7])
 
 	// Set addr's coins and addr2's coins
 	suite.Require().NoError(testutil.FundAccount(app.BankKeeper, ctx, addr, sdk.NewCoins(sdk.NewInt64Coin(fooDenom, 50))))
@@ -645,7 +646,7 @@ func (suite *IntegrationTestSuite) TestMsgMultiSendEvents() {
 	suite.Require().NoError(app.BankKeeper.InputOutputCoins(ctx, inputs, outputs))
 
 	events = ctx.EventManager().ABCIEvents()
-	suite.Require().Equal(28, len(events)) // 25 due to account funding + coin_spent + coin_recv events
+	suite.Require().Equal(2+28, len(events)) // 25 due to account funding + coin_spent + coin_recv events
 
 	event2 := sdk.Event{
 		Type:       sdk.EventTypeMessage,
@@ -679,10 +680,10 @@ func (suite *IntegrationTestSuite) TestMsgMultiSendEvents() {
 		abci.EventAttribute{Key: []byte(sdk.AttributeKeyAmount), Value: []byte(newCoins2.String())},
 	)
 	// events are shifted due to the funding account events
-	suite.Require().Equal(abci.Event(event1), events[21])
-	suite.Require().Equal(abci.Event(event2), events[23])
-	suite.Require().Equal(abci.Event(event3), events[25])
-	suite.Require().Equal(abci.Event(event4), events[27])
+	suite.Require().Equal(abci.Event(event1), events[2+21])
+	suite.Require().Equal(abci.Event(event2), events[2+23])
+	suite.Require().Equal(abci.Event(event3), events[2+25])
+	suite.Require().Equal(abci.Event(event4), events[2+27])
 }
 
 func (suite *IntegrationTestSuite) TestSpendableCoins() {

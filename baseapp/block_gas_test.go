@@ -24,7 +24,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
 var blockMaxGas = uint64(simapp.DefaultConsensusParams.Block.MaxGas)
@@ -79,16 +78,17 @@ func TestBaseApp_BlockGas(t *testing.T) {
 			ctx := app.NewContext(false, tmproto.Header{})
 
 			// tx fee
-			feeCoin := sdk.NewCoin("atom", sdk.NewInt(150))
+			feeCoin := sdk.NewCoin("gas", sdk.NewInt(150))
 			feeAmount := sdk.NewCoins(feeCoin)
 
 			// test account and fund
 			priv1, _, addr1 := testdata.KeyTestPubAddr()
-			err = app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, feeAmount)
+
+			acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr1)
+			app.AccountKeeper.SetAccount(ctx, acc)
+			err = app.AccountKeeper.AddBalanceToProperty(ctx, acc, feeAmount)
 			require.NoError(t, err)
-			err = app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr1, feeAmount)
-			require.NoError(t, err)
-			require.Equal(t, feeCoin.Amount, app.BankKeeper.GetBalance(ctx, addr1, feeCoin.Denom).Amount)
+
 			seq, _ := app.AccountKeeper.GetSequence(ctx, addr1)
 			require.Equal(t, uint64(0), seq)
 
@@ -123,7 +123,7 @@ func TestBaseApp_BlockGas(t *testing.T) {
 				require.Equal(t, []byte("ok"), okValue)
 			}
 			// check block gas is always consumed
-			baseGas := uint64(70184) // baseGas is the gas consumed before tx msg
+			baseGas := uint64(63843) // baseGas is the gas consumed before tx msg
 			expGasConsumed := addUint64Saturating(tc.gasToConsume, baseGas)
 			if expGasConsumed > txtypes.MaxGasWanted {
 				// capped by gasLimit
@@ -131,7 +131,9 @@ func TestBaseApp_BlockGas(t *testing.T) {
 			}
 			require.Equal(t, expGasConsumed, ctx.BlockGasMeter().GasConsumed())
 			// tx fee is always deducted
-			require.Equal(t, int64(0), app.BankKeeper.GetBalance(ctx, addr1, feeCoin.Denom).Amount.Int64())
+			p, err := app.AccountKeeper.GetProperty(ctx, acc)
+			require.NoError(t, err)
+			require.Equal(t, int64(0), p.Balances.AmountOf("gas").Int64())
 			// sender's sequence is always increased
 			seq, err = app.AccountKeeper.GetSequence(ctx, addr1)
 			require.NoError(t, err)

@@ -18,7 +18,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// PropertyNftClassID is the NFT Class ID for user properties
-	PropertyNftClassID = "gratis_user_property"
+	PropertyNftClassID = "gratis_property"
 )
 
 var (

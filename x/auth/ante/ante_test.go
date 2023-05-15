@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -140,9 +138,7 @@ func (suite *AnteTestSuite) TestAnteHandlerSigErrors() {
 			func() {
 				acc1 := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, addr0)
 				suite.app.AccountKeeper.SetAccount(suite.ctx, acc1)
-				err := suite.app.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, feeAmount)
-				suite.Require().NoError(err)
-				err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, addr0, feeAmount)
+				err := suite.app.AccountKeeper.AddBalanceToProperty(suite.ctx, acc1, feeAmount)
 				suite.Require().NoError(err)
 			},
 			false,
@@ -471,7 +467,7 @@ func (suite *AnteTestSuite) TestAnteHandlerFees() {
 		{
 			"signer does not have enough funds to pay the fee",
 			func() {
-				err := testutil.FundAccount(suite.app.BankKeeper, suite.ctx, addr0, sdk.NewCoins(sdk.NewInt64Coin("atom", 149)))
+				err := testutil.FundPropertyOfAccount(suite.app.AccountKeeper, suite.ctx, addr0, sdk.NewCoins(sdk.NewInt64Coin("gas", 149)))
 				suite.Require().NoError(err)
 			},
 			false,
@@ -486,9 +482,11 @@ func (suite *AnteTestSuite) TestAnteHandlerFees() {
 				modAcc := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.FeeCollectorName)
 
 				suite.Require().True(suite.app.BankKeeper.GetAllBalances(suite.ctx, modAcc.GetAddress()).Empty())
-				require.True(sdk.IntEq(suite.T(), suite.app.BankKeeper.GetAllBalances(suite.ctx, addr0).AmountOf("atom"), sdk.NewInt(149)))
+				p, err := suite.app.AccountKeeper.GetProperty(suite.ctx, acc1)
+				suite.Require().NoError(err)
+				require.True(sdk.IntEq(suite.T(), p.Balances.AmountOf("gas"), sdk.NewInt(149)))
 
-				err := testutil.FundAccount(suite.app.BankKeeper, suite.ctx, addr0, sdk.NewCoins(sdk.NewInt64Coin("atom", 1)))
+				err = testutil.FundPropertyOfAccount(suite.app.AccountKeeper, suite.ctx, addr0, sdk.NewCoins(sdk.NewInt64Coin("gas", 1)))
 				suite.Require().NoError(err)
 			},
 			false,
@@ -498,10 +496,9 @@ func (suite *AnteTestSuite) TestAnteHandlerFees() {
 		{
 			"signer doesn't have any more funds",
 			func() {
-				modAcc := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.FeeCollectorName)
-
-				require.True(sdk.IntEq(suite.T(), suite.app.BankKeeper.GetAllBalances(suite.ctx, modAcc.GetAddress()).AmountOf("atom"), sdk.NewInt(150)))
-				require.True(sdk.IntEq(suite.T(), suite.app.BankKeeper.GetAllBalances(suite.ctx, addr0).AmountOf("atom"), sdk.NewInt(0)))
+				p, err := suite.app.AccountKeeper.GetProperty(suite.ctx, acc1)
+				suite.Require().NoError(err)
+				require.True(sdk.IntEq(suite.T(), p.Balances.AmountOf("gas"), sdk.NewInt(0)))
 			},
 			false,
 			false,
@@ -538,7 +535,7 @@ func (suite *AnteTestSuite) TestAnteHandlerMemoGas() {
 		{
 			"tx does not have enough gas",
 			func() {
-				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("atom", 0))
+				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("gas", 0))
 				gasLimit = 0
 			},
 			false,
@@ -548,7 +545,7 @@ func (suite *AnteTestSuite) TestAnteHandlerMemoGas() {
 		{
 			"tx with memo doesn't have enough gas",
 			func() {
-				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("atom", 0))
+				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("gas", 0))
 				gasLimit = 801
 				suite.txBuilder.SetMemo("abcininasidniandsinasindiansdiansdinaisndiasndiadninsd")
 			},
@@ -559,7 +556,7 @@ func (suite *AnteTestSuite) TestAnteHandlerMemoGas() {
 		{
 			"memo too large",
 			func() {
-				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("atom", 0))
+				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("gas", 0))
 				gasLimit = 50000
 				suite.txBuilder.SetMemo(strings.Repeat("01234567890", 500))
 			},
@@ -570,7 +567,7 @@ func (suite *AnteTestSuite) TestAnteHandlerMemoGas() {
 		{
 			"tx with memo has enough gas",
 			func() {
-				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("atom", 0))
+				feeAmount = sdk.NewCoins(sdk.NewInt64Coin("gas", 0))
 				gasLimit = 60000
 				suite.txBuilder.SetMemo(strings.Repeat("0123456789", 10))
 			},
@@ -1139,8 +1136,10 @@ func (suite *AnteTestSuite) TestAnteHandlerReCheck() {
 
 	// remove funds for account so antehandler fails on recheck
 	suite.app.AccountKeeper.SetAccount(suite.ctx, accounts[0].acc)
-	balances := suite.app.BankKeeper.GetAllBalances(suite.ctx, accounts[0].acc.GetAddress())
-	err = suite.app.BankKeeper.SendCoinsFromAccountToModule(suite.ctx, accounts[0].acc.GetAddress(), minttypes.ModuleName, balances)
+	property, err := suite.app.AccountKeeper.GetProperty(suite.ctx, accounts[0].acc)
+	suite.Require().NoError(err)
+	property.Balances = sdk.NewCoins()
+	err = suite.app.AccountKeeper.UpdateProperty(suite.ctx, accounts[0].acc, property)
 	suite.Require().NoError(err)
 
 	_, err = suite.anteHandler(suite.ctx, tx, false)

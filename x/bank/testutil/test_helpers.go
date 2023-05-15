@@ -1,7 +1,10 @@
 package testutil
 
 import (
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
@@ -32,4 +35,18 @@ func FundModuleAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, recipientM
 	}
 
 	return bankKeeper.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, recipientMod, amounts)
+}
+
+func FundPropertyOfAccount(ak keeper.AccountKeeper, ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
+	var acc auth.AccountI
+	if !ak.HasAccount(ctx, addr) {
+		// create an account
+		acc = ak.NewAccountWithAddress(ctx, addr)
+		defer telemetry.IncrCounter(1, "new", "account")
+		ak.SetAccount(ctx, acc)
+	} else {
+		acc = ak.GetAccount(ctx, addr)
+	}
+
+	return ak.AddBalanceToProperty(ctx, acc, amounts)
 }

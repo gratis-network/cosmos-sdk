@@ -14,7 +14,6 @@ message Property {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
-  cosmos.base.v1beta1.NFT                 nft = 1 [(gogoproto.embed) = true];
-  repeated cosmos.base.v1beta1.Coin       balances = 2
+  repeated cosmos.base.v1beta1.Coin       balances = 1
   [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "Coins"];
 }

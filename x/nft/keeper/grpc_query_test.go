@@ -550,7 +550,7 @@ func (s *TestSuite) TestClasses() {
 			},
 			"",
 			func(index int, require *require.Assertions, res *nft.QueryClassesResponse) {
-				require.Len(res.Classes, 0)
+				require.Len(res.Classes, 1) // only property NFT class
 			},
 		},
 		{
@@ -571,8 +571,8 @@ func (s *TestSuite) TestClasses() {
 			},
 			"",
 			func(index int, require *require.Assertions, res *nft.QueryClassesResponse) {
-				require.Len(res.Classes, 1, "the error occurred on:%d", index)
-				require.Equal(*res.Classes[0], classes[0], "the error occurred on:%d", index)
+				require.Len(res.Classes, 2, "the error occurred on:%d", index)
+				require.Equal(*res.Classes[1], classes[0], "the error occurred on:%d", index)
 			},
 		},
 	}

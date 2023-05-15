@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
-
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -62,7 +60,7 @@ type AccountKeeper struct {
 	proto      func() types.AccountI
 	addressCdc address.Codec
 	// NFT keeper for User Properties
-	nftKeeper nftkeeper.Keeper
+	nftKeeper types.NftKeeper
 }
 
 var _ AccountKeeperI = &AccountKeeper{}
@@ -99,15 +97,15 @@ func NewAccountKeeper(
 	}
 }
 
-// NewAccountKeeperWithNftKeeper returns a new AccountKeeperI with a NFT keeper which is used for User Properties
-func NewAccountKeeperWithNftKeeper(
-	cdc codec.BinaryCodec, key storetypes.StoreKey, paramstore paramtypes.Subspace, proto func() types.AccountI,
-	maccPerms map[string][]string, bech32Prefix string,
-	nftKeeper nftkeeper.Keeper,
-) AccountKeeper {
-	keeper := NewAccountKeeper(cdc, key, paramstore, proto, maccPerms, bech32Prefix)
-	keeper.nftKeeper = nftKeeper
-	return keeper
+// GetNFTKeeper returns the NFT keeper which is used for User Properties
+func (ak AccountKeeper) GetNFTKeeper() types.NftKeeper {
+	return ak.nftKeeper
+}
+
+// SetNFTKeeper set a NFT keeper which is used for User Properties
+func (ak *AccountKeeper) SetNFTKeeper(nftKeeper types.NftKeeper) error {
+	ak.nftKeeper = nftKeeper
+	return nil
 }
 
 // Logger returns a module-specific logger.
