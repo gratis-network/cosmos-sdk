@@ -27,8 +27,8 @@ func (ak AccountKeeper) GetProperty(ctx sdk.Context, acc types.AccountI) (sdk.Pr
 	return *data.(*sdk.Property), nil
 }
 
-// UpdateProperty update the property of an account
-func (ak AccountKeeper) UpdateProperty(ctx sdk.Context, acc types.AccountI, property sdk.Property) error {
+// SetProperty update the property of an account
+func (ak AccountKeeper) SetProperty(ctx sdk.Context, acc types.AccountI, property sdk.Property) error {
 	propertyId := acc.GetPropertyID()
 	if len(propertyId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrOutOfGas, "account %s does not have a property yet", acc.GetAddress())
@@ -101,5 +101,5 @@ func (ak AccountKeeper) AddBalanceToProperty(ctx sdk.Context, acc types.AccountI
 	newBalance := balances.Add(amt...)
 	property.Balances = newBalance
 
-	return ak.UpdateProperty(ctx, acc, property)
+	return ak.SetProperty(ctx, acc, property)
 }

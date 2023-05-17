@@ -1139,7 +1139,7 @@ func (suite *AnteTestSuite) TestAnteHandlerReCheck() {
 	property, err := suite.app.AccountKeeper.GetProperty(suite.ctx, accounts[0].acc)
 	suite.Require().NoError(err)
 	property.Balances = sdk.NewCoins()
-	err = suite.app.AccountKeeper.UpdateProperty(suite.ctx, accounts[0].acc, property)
+	err = suite.app.AccountKeeper.SetProperty(suite.ctx, accounts[0].acc, property)
 	suite.Require().NoError(err)
 
 	_, err = suite.anteHandler(suite.ctx, tx, false)
