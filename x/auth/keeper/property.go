@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"cosmossdk.io/errors"
 	"fmt"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,13 +12,13 @@ import (
 // GetProperty Fetch the primary property of the account
 func (ak AccountKeeper) GetProperty(ctx sdk.Context, acc types.AccountI) (sdk.Property, error) {
 	if acc == nil {
-		return sdk.Property{}, fmt.Errorf("account does not exist")
+		return sdk.Property{}, errors.Wrapf(sdkerrors.ErrUnknownAddress, "account does not exist")
 	}
 	nftKeeper := ak.GetNFTKeeper()
 	propertyId := acc.GetPropertyID()
 	nft, found := nftKeeper.GetNFT(ctx, types.PropertyNftClassID, propertyId)
 	if !found {
-		return sdk.Property{}, fmt.Errorf("property NFT with id %s does not exist", propertyId)
+		return sdk.Property{}, errors.Wrapf(sdkerrors.ErrNotFound, "property NFT with id %s does not exist", propertyId)
 	}
 	data, err := nftKeeper.ParseData(nft, &sdk.Property{})
 	if err != nil {
@@ -31,12 +32,12 @@ func (ak AccountKeeper) GetProperty(ctx sdk.Context, acc types.AccountI) (sdk.Pr
 func (ak AccountKeeper) SetProperty(ctx sdk.Context, acc types.AccountI, property sdk.Property) error {
 	propertyId := acc.GetPropertyID()
 	if len(propertyId) == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrOutOfGas, "account %s does not have a property yet", acc.GetAddress())
+		return errors.Wrapf(sdkerrors.ErrOutOfGas, "account %s does not have a property yet", acc.GetAddress())
 	}
 	nftKeeper := ak.GetNFTKeeper()
 	nft, found := nftKeeper.GetNFT(ctx, types.PropertyNftClassID, propertyId)
 	if !found {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "property NFT with id %s does not exist", propertyId)
+		return errors.Wrapf(sdkerrors.ErrUnknownAddress, "property NFT with id %s does not exist", propertyId)
 	}
 
 	newData, err := codectypes.NewAnyWithValue(&property)
@@ -67,7 +68,10 @@ func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, proper
 	// check NFT class
 	if !ak.nftKeeper.HasClass(ctx, types.PropertyNftClassID) {
 		// add property NFT class (only once)
-		ak.nftKeeper.SaveClass(ctx, sdk.Class{Id: types.PropertyNftClassID})
+		err := ak.nftKeeper.SaveClass(ctx, sdk.Class{Id: types.PropertyNftClassID})
+		if err != nil {
+			return sdk.NFT{}, fmt.Errorf("fail to mint NFT, error is %v", err)
+		}
 	}
 	data, err := codectypes.NewAnyWithValue(&property)
 	if err != nil {
@@ -91,7 +95,7 @@ func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, proper
 // AddBalanceToProperty add given amount to the balances of the primary property of an account
 func (ak AccountKeeper) AddBalanceToProperty(ctx sdk.Context, acc types.AccountI, amt sdk.Coins) error {
 	if !amt.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String())
+		return errors.Wrap(sdkerrors.ErrInvalidCoins, amt.String())
 	}
 	property, err := ak.GetProperty(ctx, acc)
 	if err != nil {
