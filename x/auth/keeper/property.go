@@ -77,13 +77,14 @@ func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, proper
 	if err != nil {
 		return sdk.NFT{}, fmt.Errorf("fail to encode property, error is %v", err)
 	}
-	id := fmt.Sprintf("%d", acc.GetAccountNumber())
+	id := fmt.Sprintf("%x%d", acc.GetAddress().Bytes()[:10], ak.GetNextPropertyNumber(ctx))
 	nft := sdk.NFT{
 		ClassId: types.PropertyNftClassID,
 		Id:      id,
 		Uri:     "gratis/property/" + id,
 		Data:    data,
 	}
+	fmt.Printf("!!! %s -> %v\n", acc.GetAddress(), nft)
 	err = ak.nftKeeper.Mint(ctx, nft, acc.GetAddress())
 	if err != nil {
 		return sdk.NFT{}, fmt.Errorf("fail to mint NFT, error is %v", err)

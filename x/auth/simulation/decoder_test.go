@@ -30,6 +30,7 @@ func TestDecodeStore(t *testing.T) {
 	require.NoError(t, err)
 
 	globalAccNumber := gogotypes.UInt64Value{Value: 10}
+	globalPropertyNumber := gogotypes.UInt64Value{Value: 20}
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
@@ -40,6 +41,10 @@ func TestDecodeStore(t *testing.T) {
 			{
 				Key:   types.GlobalAccountNumberKey,
 				Value: cdc.MustMarshal(&globalAccNumber),
+			},
+			{
+				Key:   types.GlobalPropertyNumberKey,
+				Value: cdc.MustMarshal(&globalPropertyNumber),
 			},
 			{
 				Key:   types.AccountNumberStoreKey(5),
@@ -57,6 +62,7 @@ func TestDecodeStore(t *testing.T) {
 	}{
 		{"Account", fmt.Sprintf("%v\n%v", acc, acc)},
 		{"GlobalAccNumber", fmt.Sprintf("GlobalAccNumberA: %d\nGlobalAccNumberB: %d", globalAccNumber, globalAccNumber)},
+		{"GlobalPropertyNumber", fmt.Sprintf("GlobalPropertyNumberA: %d\nGlobalPropertyNumberB: %d", globalPropertyNumber, globalPropertyNumber)},
 		{"AccNum", fmt.Sprintf("AccNumA: %s\nAccNumB: %s", acc.GetAddress(), acc.GetAddress())},
 		{"other", ""},
 	}

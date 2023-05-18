@@ -160,6 +160,33 @@ func (ak AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	return accNumber
 }
 
+// GetNextPropertyNumber returns and increments the global property number counter.
+// If the global property number is not set, it initializes it with value 0.
+func (ak AccountKeeper) GetNextPropertyNumber(ctx sdk.Context) uint64 {
+	var propertyNumber uint64
+	store := ctx.KVStore(ak.key)
+
+	bz := store.Get(types.GlobalPropertyNumberKey)
+	if bz == nil {
+		// initialize the account numbers
+		propertyNumber = 0
+	} else {
+		val := gogotypes.UInt64Value{}
+
+		err := ak.cdc.Unmarshal(bz, &val)
+		if err != nil {
+			panic(err)
+		}
+
+		propertyNumber = val.GetValue()
+	}
+
+	bz = ak.cdc.MustMarshal(&gogotypes.UInt64Value{Value: propertyNumber + 1})
+	store.Set(types.GlobalPropertyNumberKey, bz)
+
+	return propertyNumber
+}
+
 // ValidatePermissions validates that the module account has been granted
 // permissions within its set of allowed permissions.
 func (ak AccountKeeper) ValidatePermissions(macc types.ModuleAccountI) error {

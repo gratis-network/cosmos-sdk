@@ -25,8 +25,11 @@ var (
 	// AddressStoreKeyPrefix prefix for account-by-address store
 	AddressStoreKeyPrefix = []byte{0x01}
 
-	// param key for global account number
+	// GlobalAccountNumberKey param key for global account number
 	GlobalAccountNumberKey = []byte("globalAccountNumber")
+
+	// GlobalPropertyNumberKey param key for global property number
+	GlobalPropertyNumberKey = []byte("globalPropertyNumber")
 
 	// AccountNumberStoreKeyPrefix prefix for account-by-id store
 	AccountNumberStoreKeyPrefix = []byte("accountNumber")

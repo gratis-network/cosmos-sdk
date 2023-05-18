@@ -42,6 +42,13 @@ func NewDecodeStore(ak AuthUnmarshaler) func(kvA, kvB kv.Pair) string {
 
 			return fmt.Sprintf("GlobalAccNumberA: %d\nGlobalAccNumberB: %d", globalAccNumberA, globalAccNumberB)
 
+		case bytes.Equal(kvA.Key, types.GlobalPropertyNumberKey):
+			var globalPropertyNumberA, globalPropertyNumberB gogotypes.UInt64Value
+			ak.GetCodec().MustUnmarshal(kvA.Value, &globalPropertyNumberA)
+			ak.GetCodec().MustUnmarshal(kvB.Value, &globalPropertyNumberB)
+
+			return fmt.Sprintf("GlobalPropertyNumberA: %d\nGlobalPropertyNumberB: %d", globalPropertyNumberA, globalPropertyNumberB)
+
 		case bytes.HasPrefix(kvA.Key, types.AccountNumberStoreKeyPrefix):
 			var accNumA, accNumB sdk.AccAddress
 			err := accNumA.Unmarshal(kvA.Value)
