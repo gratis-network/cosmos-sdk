@@ -21,22 +21,21 @@ func (ak AccountKeeper) NewAccount(ctx sdk.Context, acc types.AccountI) types.Ac
 	if err := acc.SetAccountNumber(ak.GetNextAccountNumber(ctx)); err != nil {
 		panic(err)
 	}
+	_, isModuleAccount := acc.(types.ModuleAccountI)
+	if isModuleAccount {
+		return acc
+	}
 	if ak.nftKeeper == nil {
 		return acc
 	}
-	switch acc.(type) {
-	case types.ModuleAccountI:
-		return acc
-	default:
-		// create a default property
-		nft, err := ak.newPropertyNFT(ctx, acc)
-		if err != nil {
-			return acc
-		}
-		// set the new property as primary
-		acc.SetPropertyID(nft.Id)
+	// create a default property
+	nft, err := ak.newPropertyNFT(ctx, acc)
+	if err != nil {
 		return acc
 	}
+	// set the new property as primary
+	acc.SetPropertyID(nft.Id)
+	return acc
 }
 
 // HasAccount implements AccountKeeperI.
@@ -86,12 +85,12 @@ func (ak AccountKeeper) GetAllAccounts(ctx sdk.Context) (accounts []types.Accoun
 func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc types.AccountI) {
 	addr := acc.GetAddress()
 	store := ctx.KVStore(ak.key)
-
+	_, isModuleAccount := acc.(types.ModuleAccountI)
 	// create a default property if not exist
-	if len(acc.GetPropertyID()) == 0 {
+	if !isModuleAccount && len(acc.GetPropertyID()) == 0 {
 		nft, err := ak.newPropertyNFT(ctx, acc)
 		if err != nil {
-			return
+			panic(err)
 		}
 		acc.SetPropertyID(nft.Id)
 	}

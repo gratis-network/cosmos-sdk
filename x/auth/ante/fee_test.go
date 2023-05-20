@@ -17,8 +17,8 @@ func (s *AnteTestSuite) TestDeductFeeDecorator_ZeroGas() {
 
 	// keys and addresses
 	priv1, _, addr1 := testdata.KeyTestPubAddr()
-	coins := sdk.NewCoins(sdk.NewCoin("atom", sdk.NewInt(300)))
-	testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+	coins := sdk.NewCoins(sdk.NewCoin("gas", sdk.NewInt(300)))
+	testutil.FundPropertyOfAccount(s.app.AccountKeeper, s.ctx, addr1, coins)
 
 	// msg and signatures
 	msg := testdata.NewTestMsg(addr1)

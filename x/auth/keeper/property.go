@@ -63,7 +63,7 @@ func (ak AccountKeeper) SetProperty(ctx sdk.Context, acc types.AccountI, propert
 // MintProperty mint a new property NFT
 func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, property sdk.Property) (sdk.NFT, error) {
 	if ak.nftKeeper == nil {
-		return sdk.NFT{}, fmt.Errorf("AccountKeeper is null")
+		return sdk.NFT{}, fmt.Errorf("NFT Keeper is null")
 	}
 	// check NFT class
 	if !ak.nftKeeper.HasClass(ctx, types.PropertyNftClassID) {
