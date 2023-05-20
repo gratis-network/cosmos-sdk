@@ -126,6 +126,9 @@ func DeductFees(nftKeeper types.NftKeeper, ctx sdk.Context, acc types.AccountI, 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
 	}
+	if nftKeeper == nil {
+		return nil
+	}
 	propertyId := acc.GetPropertyID()
 	if len(propertyId) == 0 {
 		return sdkerrors.Wrapf(sdkerrors.ErrOutOfGas, "account %s does not have a property yet", acc.GetAddress())

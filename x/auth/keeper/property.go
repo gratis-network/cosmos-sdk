@@ -84,7 +84,6 @@ func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, proper
 		Uri:     "gratis/property/" + id,
 		Data:    data,
 	}
-	fmt.Printf("!!! %s -> %v\n", acc.GetAddress(), nft)
 	err = ak.nftKeeper.Mint(ctx, nft, acc.GetAddress())
 	if err != nil {
 		return sdk.NFT{}, fmt.Errorf("fail to mint NFT, error is %v", err)

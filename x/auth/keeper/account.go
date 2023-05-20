@@ -29,9 +29,7 @@ func (ak AccountKeeper) NewAccount(ctx sdk.Context, acc types.AccountI) types.Ac
 		return acc
 	default:
 		// create a default property
-		coins := sdk.NewCoins()
-		property := sdk.NewProperty(coins...)
-		nft, err := ak.MintProperty(ctx, acc, property)
+		nft, err := ak.newPropertyNFT(ctx, acc)
 		if err != nil {
 			return acc
 		}
@@ -89,6 +87,15 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc types.AccountI) {
 	addr := acc.GetAddress()
 	store := ctx.KVStore(ak.key)
 
+	// create a default property if not exist
+	if len(acc.GetPropertyID()) == 0 {
+		nft, err := ak.newPropertyNFT(ctx, acc)
+		if err != nil {
+			return
+		}
+		acc.SetPropertyID(nft.Id)
+	}
+
 	bz, err := ak.MarshalAccount(acc)
 	if err != nil {
 		panic(err)
@@ -121,4 +128,11 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account types.A
 			break
 		}
 	}
+}
+
+// newPropertyNFT creates a default property NFT
+func (ak AccountKeeper) newPropertyNFT(ctx sdk.Context, acc types.AccountI) (sdk.NFT, error) {
+	coins := sdk.NewCoins()
+	property := sdk.NewProperty(coins...)
+	return ak.MintProperty(ctx, acc, property)
 }
