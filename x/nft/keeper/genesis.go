@@ -10,6 +10,9 @@ import (
 // InitGenesis new nft genesis
 func (k Keeper) InitGenesis(ctx sdk.Context, data *nft.GenesisState) {
 	for _, class := range data.Classes {
+		if k.HasClass(ctx, class.Id) {
+			continue
+		}
 		if err := k.SaveClass(ctx, *class); err != nil {
 			panic(err)
 		}

@@ -3,7 +3,6 @@ package keeper
 import (
 	"cosmossdk.io/errors"
 	"fmt"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -40,7 +39,7 @@ func (ak AccountKeeper) SetProperty(ctx sdk.Context, acc types.AccountI, propert
 		return errors.Wrapf(sdkerrors.ErrUnknownAddress, "property NFT with id %s does not exist", propertyId)
 	}
 
-	newData, err := codectypes.NewAnyWithValue(&property)
+	newData, err := property.ToAny()
 	if err != nil {
 		return err
 	}
@@ -73,11 +72,11 @@ func (ak AccountKeeper) MintProperty(ctx sdk.Context, acc types.AccountI, proper
 			return sdk.NFT{}, fmt.Errorf("fail to mint NFT, error is %v", err)
 		}
 	}
-	data, err := codectypes.NewAnyWithValue(&property)
+	data, err := property.ToAny()
 	if err != nil {
 		return sdk.NFT{}, fmt.Errorf("fail to encode property, error is %v", err)
 	}
-	id := fmt.Sprintf("%x%d", acc.GetAddress().Bytes()[:10], ak.GetNextPropertyNumber(ctx))
+	id := fmt.Sprintf("p%x%d", acc.GetAddress().Bytes()[:5], ak.GetNextPropertyNumber(ctx))
 	nft := sdk.NFT{
 		ClassId: types.PropertyNftClassID,
 		Id:      id,

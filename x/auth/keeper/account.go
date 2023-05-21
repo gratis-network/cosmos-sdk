@@ -28,13 +28,15 @@ func (ak AccountKeeper) NewAccount(ctx sdk.Context, acc types.AccountI) types.Ac
 	if ak.nftKeeper == nil {
 		return acc
 	}
-	// create a default property
-	nft, err := ak.newPropertyNFT(ctx, acc)
-	if err != nil {
-		return acc
+	if len(acc.GetPropertyID()) == 0 {
+		// create a default property
+		nft, err := ak.newPropertyNFT(ctx, acc)
+		if err != nil {
+			return acc
+		}
+		// set the new property as primary
+		acc.SetPropertyID(nft.Id)
 	}
-	// set the new property as primary
-	acc.SetPropertyID(nft.Id)
 	return acc
 }
 

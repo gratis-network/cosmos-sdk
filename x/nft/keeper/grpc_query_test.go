@@ -279,7 +279,8 @@ func (s *TestSuite) TestNFTs() {
 			},
 			"",
 			func(index int, require *require.Assertions, res *nft.QueryNFTsResponse) {
-				require.Len(res.Nfts, 0, "the error occurred on:%d", index)
+				// only property class exists
+				require.Len(res.Nfts, 1, "the error occurred on:%d", index)
 			},
 		},
 		{
@@ -321,7 +322,8 @@ func (s *TestSuite) TestNFTs() {
 				}
 
 				req = &nft.QueryNFTsRequest{
-					Owner: s.addrs[2].String(),
+					Owner:   s.addrs[2].String(),
+					ClassId: "MyKitty",
 				}
 			},
 			"",
